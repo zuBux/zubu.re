@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Blog on zuBu&#39;s homepage</title>
+    <link>https://zubu.re/blog/index.xml</link>
+    <description>Recent content in Blog on zuBu&#39;s homepage</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <lastBuildDate>Mon, 15 Feb 2016 17:03:05 +0000</lastBuildDate>
+    <atom:link href="https://zubu.re/blog/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Actionable security requirements using BDD</title>
+      <link>https://zubu.re/blog/actionable-security-requirements-using-bdd/</link>
+      <pubDate>Mon, 15 Feb 2016 17:03:05 +0000</pubDate>
+      
+      <guid>https://zubu.re/blog/actionable-security-requirements-using-bdd/</guid>
+      <description>
+
+&lt;h1 id=&#34;short-intro-to-bdd&#34;&gt;Short intro to BDD&lt;/h1&gt;
+
+&lt;p&gt;Checklists are useful for many security-related tasks. Whether we &amp;rsquo;re threat modeling, code reviewing or pentesting an application, at some point we all feel an urge to tick off some check boxes. Checklists are also a very compact way to communicate security requirements. However sometimes we take for granted that these requirements are understandable by all involved parties. This assumption may result to dialogues like the following:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;-Hey, you mention here that our app is vulnerable to session fixation.&lt;/p&gt;
+
+&lt;p&gt;-That&amp;rsquo;s correct.&lt;/p&gt;
+
+&lt;p&gt;-OK&amp;hellip;What&amp;rsquo;s that?&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;If complexity is the enemy of security, then &lt;strong&gt;visibility is security&amp;rsquo;s most trusted ally&lt;/strong&gt;. When every team member, whether they &amp;rsquo;re security engineers, developers, testers, understands security specifications through a common vocabulary, chances of a bug slipping into production will get slimmer. &lt;strong&gt;This is where Behavior-Driven Development, or BDD, comes in.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;In simple words, BDD is a process of verifying a product&amp;rsquo;s behaviour using User Stories (for a more detailed, description see &lt;a href=&#34;http://guide.agilealliance.org/guide/bdd.html&#34;&gt;here&lt;/a&gt;. For example, in order to clarify Session Fixation in the previous dialogue, we can use the following BDD scenario:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Scenario: Session Fixation
+    Given a new browser instance
+    And user testuser1 is logged in with password test1234
+    When user logs out
+    And user testuser1 logs in with password test1234
+    Then session tokens should be different
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;What&amp;rsquo;s not to understand, right? Using the &lt;a href=&#34;https://cucumber.io/docs/reference#gherkin&#34;&gt;Gherkin&lt;/a&gt; language, every scenario can be expressed using the Given, When, Then structure, which the author uses to describe the product&amp;rsquo;s desired behaviour. Each sentence is called a Step (e.g user %s logs in) which is mapped to the actual testing code.&lt;/p&gt;
+
+&lt;p&gt;Each scenario belongs to a Feature which is actually a &lt;a href=&#34;https://en.wikipedia.org/wiki/User_story&#34;&gt;user story&lt;/a&gt;. A Feature will usually contain multiple scenarios.&lt;/p&gt;
+
+&lt;h1 id=&#34;using-aloe-to-prevent-burns&#34;&gt;Using Aloe to prevent burns&lt;/h1&gt;
+
+&lt;p&gt;Currently, the dominant frameworks for Behavior-Driven Development are &lt;a href=&#34;https://cucumber.io/&#34;&gt;Cucumber&lt;/a&gt; (Ruby) and &lt;a href=&#34;http://jbehave.org/&#34;&gt;JBehave&lt;/a&gt; (Java). The idea of utilising BDD specifically for security testing has been around for sometime also, with &lt;a href=&#34;http://www.continuumsecurity.net/bdd-intro.html&#34;&gt;BDD-Security&lt;/a&gt;, &lt;a href=&#34;http://gauntlt.org/&#34;&gt;Gauntlt&lt;/a&gt; and &lt;a href=&#34;https://github.com/F-Secure/mittn&#34;&gt;mittn&lt;/a&gt; being the prime examples. Since Python is my weapon of choice, I decided to try out &lt;a href=&#34;http://aloe.readthedocs.org/en/latest/#&#34;&gt;Aloe&lt;/a&gt;, a rather new but promising Python BDD framework originating from &lt;a href=&#34;http://lettuce.it/intro/overview.html&#34;&gt;lettuce&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s start by installing aloe:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;pip install aloe
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Create a directory for your project&amp;rsquo;s tests (e.g. mywebapp) and place inside a directory named &lt;code&gt;features&lt;/code&gt;, which will contain the following files:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;steps.py&lt;/code&gt; - Step definitions for our Features&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;session_management.feature&lt;/code&gt; - The Feature we will be running&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;__init__.py&lt;/code&gt; - Directories containing Features must contain packages (see &lt;a href=&#34;http://aloe.readthedocs.org/en/latest/features.html#feature-loading&#34;&gt;here&lt;/a&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;session_management.feature&lt;/code&gt; will define all our requirements for secure session management through multiple scenarios. Since this is an introductory tutorial I will implement only a few. A secure session management User Story can be described as:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Feature: Session Management
+
+        As a user
+        I want my session to be securely managed
+        So that a malicious user cannot impersonate me
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;followed by all relevant scenarios.&lt;/p&gt;
+
+&lt;h1 id=&#34;writing-steps&#34;&gt;Writing Steps&lt;/h1&gt;
+
+&lt;p&gt;BDD steps should describe the desired behaviour of your software in a way that everyone can understand, &lt;strong&gt;so try to avoid gory implementation details as much as possible&lt;/strong&gt;. Borrowing an &lt;a href=&#34;http://aloe.readthedocs.org/en/latest/steps.html#writing-good-bdd-steps&#34;&gt;example&lt;/a&gt; from the official documentation, you should prefer this :&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;When user testuser1 logs in with password test1234&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;over this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;When I fill in username with &amp;quot;testuser&amp;quot;
+And I fill in password with &amp;quot;test1234&amp;quot;
+And I press &amp;quot;Log on&amp;quot;
+And I wait for title to contain &amp;quot;Landing Page&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Back to our requirement, since we &amp;rsquo;re testing a web app, a web browser automation framework such as &lt;a href=&#34;seleniumhq.org&#34;&gt;Selenium&lt;/a&gt; is essential for verifying that the app is behaving in the desired way. Here&amp;rsquo;s the implementation of our steps:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from aloe import world, step, before, after
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+
+URL = &#39;http://myinsecureapp.com&#39;
+
+
+@step
+def compare_tokens(self):
+    &#39;&#39;&#39;session tokens should be different&#39;&#39;&#39;
+    try:
+        assert world.session_tokens[0] != world.session_tokens[1]
+    except IndexError:
+        print &amp;quot;Not enough session tokens to compare.&amp;quot;
+
+
+@step
+def user_login(self, user, password):
+    &#39;&#39;&#39;user (\w+) with password (\w+) is logged in&#39;&#39;&#39;
+    world.browser.get(URL)
+    username_field = world.browser.find_element_by_name(&#39;Email&#39;)
+    username_field.send_keys(user)
+    pass_field = world.browser.find_element_by_name(&#39;Password&#39;)
+    pass_field.send_keys(password)
+    world.browser.find_element_by_id(&#39;submit-btn&#39;).click()
+    try:
+        WebDriverWait(world.browser, 30).until(EC.title_contains(&amp;quot;Landing Page&amp;quot;))
+    except:
+        print &amp;quot;Unable to login&amp;quot;
+
+    self.then(&#39;the value of the session token is saved&#39;)
+
+
+@step
+def user_login_2(self, user, password):
+    &#39;&#39;&#39; user (\w+) logs in with password (\w+)&#39;&#39;&#39;
+    self.behave_as(&amp;quot;Given user {} with password {} is logged in&amp;quot;.format(user, password))
+
+
+@step
+def user_logout(self):
+    &#39;&#39;&#39;user logs out&#39;&#39;&#39;
+    world.browser.execute_script(&amp;quot;return LogMeout();&amp;quot;)
+
+
+@step
+def new_browser_instance(self):
+    &#39;&#39;&#39;a new browser instance&#39;&#39;&#39;
+    world.browser = webdriver.Firefox()
+
+
+@step
+def store_session_token(self):
+    &#39;&#39;&#39;the value of the session token is saved&#39;&#39;&#39;
+    for cookie in world.browser.get_cookies():
+        if cookie[&#39;name&#39;] == &#39;PHPSESSID&#39;:
+            world.session_tokens.append(cookie[&#39;value&#39;])
+
+
+@before.all
+def init():
+    world.session_tokens = []
+
+
+@after.each_example
+def teardown_browser(scenario, outline, steps):
+    world.session_tokens = []
+    world.browser.delete_all_cookies()
+    world.browser.quit()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Step code is pretty much self-explanatory. A few noteworthy points:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Step sentences can be defined in 3 different &lt;a href=&#34;http://aloe.readthedocs.org/en/latest/steps.html#defining-steps&#34;&gt;ways&lt;/a&gt; , I chose the function doc.&lt;/li&gt;
+&lt;li&gt;The &lt;code&gt;@before.all&lt;/code&gt; and &lt;code&gt;@after.all&lt;/code&gt; decorators are used to described actions that will execute before and after the scenario execution.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;world&lt;/code&gt; is an Aloe &lt;a href=&#34;http://aloe.readthedocs.org/en/latest/hooks.html#world&#34;&gt;object&lt;/a&gt; that can be used to store information related to the test process&lt;/li&gt;
+&lt;li&gt;After each test a new browser instance is created for more deterministic results (it&amp;rsquo;s a little slower though)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Test your app by running &lt;code&gt;aloe features/session_management.feature&lt;/code&gt;. You can find this and a few other example scenarios &lt;a href=&#34;https://github.com/zuBux/aloe-security-features&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h1 id=&#34;usable-output&#34;&gt;Usable output&lt;/h1&gt;
+
+&lt;p&gt;Since Aloe is a plugin for &lt;a href=&#34;https://nose.readthedocs.org/en/latest/&#34;&gt;nose&lt;/a&gt;, a Python unit testing framework, &lt;code&gt;aloe&lt;/code&gt; accepts the same flags as &lt;a href=&#34;https://nose.readthedocs.org/en/latest/genindex.html#Symbols&#34;&gt;nosetests&lt;/a&gt;. This means that we can use nose&amp;rsquo;s &lt;code&gt;--with-xunit&lt;/code&gt; and &lt;code&gt;--xunit-file=&amp;lt;filename&amp;gt;.xml&lt;/code&gt; to produce XUnit XML output for our tests, which is parseable by the majority of CI/CD systems (e.g Jenkins).&lt;/p&gt;
+
+&lt;h1 id=&#34;final-words&#34;&gt;Final Words&lt;/h1&gt;
+
+&lt;p&gt;BDD is a way to convert user stories or requirements, in this case security-related, into automated tests. These and similar tests might help you protect your app against a large number of common XSS payloads &lt;strong&gt;but it won&amp;rsquo;t ensure that your sanitization filters are 100% bulletproof&lt;/strong&gt;. However I strongly believe that as a process it provides a clean, reusable and automated way to catch lots of low-hanging fruit while educating your team on secure coding practices.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Fuzzing automation with AFL and Jenkins</title>
+      <link>https://zubu.re/blog/fuzzing-automation-with-afl-and-jenkins/</link>
+      <pubDate>Wed, 13 Jan 2016 17:21:05 +0000</pubDate>
+      
+      <guid>https://zubu.re/blog/fuzzing-automation-with-afl-and-jenkins/</guid>
+      <description>
+
+&lt;h1 id=&#34;introduction&#34;&gt;Introduction&lt;/h1&gt;
+
+&lt;p&gt;Fuzzing is a very effective testing technique for discovering software bugs. The basic principle is simple. Feed your program with mutated/random data, watch how it reacts. Security researchers spend countless hours creating fuzzers, trimming test cases and fuzzing interesting programs, for fun and profit. Fuzz testing is also considered an important part of every Secure Development Lifecycle (SDLC) and should be performed on a regular basis. Is it though? Considering the modern Continuous Delivery environment and the time needed for preparing and running a successful fuzzing test suite, this type of testing is often left as a permanent entry in the team&amp;rsquo;s backlog or ends up as a one-time test.&lt;/p&gt;
+
+&lt;p&gt;Fortunately, the arsenal of fuzzing tools has increased over the past few years and their usability keeps getting better and better. A great example of this progress is the &lt;a href=&#34;http://lcamtuf.coredump.cx/afl/&#34;&gt;American Fuzz Lop&lt;/a&gt; (AFL) fuzzer created by Michał Zalewski.&lt;/p&gt;
+
+&lt;p&gt;However, no matter how easy-to-learn a tool is, sometimes it&amp;rsquo;s all about integrating it into an existing workflow. This tutorial explains how to easily prepare fuzzing jobs in Jenkins using AFL with a little help from Docker.&lt;/p&gt;
+
+&lt;h1 id=&#34;choosing-the-right-jenkins-plugin&#34;&gt;Choosing the right Jenkins plugin&lt;/h1&gt;
+
+&lt;p&gt;Although there are numerous Jenkins plugins for Docker integration I decided to go with &lt;a href=&#34;https://wiki.jenkins-ci.org/display/JENKINS/CloudBees+Docker+Custom+Build+Environment+Plugin&#34;&gt;CloudBees Docker Custom Build Environment Plugin&lt;/a&gt;. The reasons where:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Compared to &lt;a href=&#34;https://wiki.jenkins-ci.org/display/JENKINS/Docker+Plugin&#34;&gt;docker-plugin&lt;/a&gt;, Cloudbees&amp;rsquo; plugin follows a more strict Docker workflow. Devs should not get used to SSH connect to their containers and juggle between sudo-enabled users even in development environments.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;a href=&#34;https://wiki.jenkins-ci.org/display/JENKINS/Docker+build+step+plugin&#34;&gt;Docker build step&lt;/a&gt; could have been another option but it lacked some essential features like unix sockets and volume support.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;So, before proceeding make sure you have CloudBees Docker Custom Build Environment Plugin installed.&lt;/p&gt;
+
+&lt;h2 id=&#34;preparing-your-docker-image&#34;&gt;Preparing your Docker image&lt;/h2&gt;
+
+&lt;p&gt;In order to make things simple I created an Ubuntu-based Docker image which has AFL pre-installed in &lt;code&gt;/usr&lt;/code&gt; and all essential environmental variables set (e.g. CXX,CC, AFL_HARDEN) You can find the image &lt;a href=&#34;https://hub.docker.com/r/zubu/afl-slave/&#34;&gt;here&lt;/a&gt; and the Dockerfile &lt;a href=&#34;https://github.com/zuBux/afl-slave&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;For the purposes of this tutorial I am going to use the lha compression utility as an example fuzzing target.&lt;/p&gt;
+
+&lt;p&gt;Open Jenkins homepage in your browser and select &amp;ldquo;&lt;strong&gt;New Item&lt;/strong&gt;&amp;rdquo; and &amp;ldquo;&lt;strong&gt;Freestyle project&lt;/strong&gt;&amp;rdquo; option. Name your Item something like lha-fuzz to distinguish it from a normal build (supposing you &amp;rsquo;re a member of the development team ) Select your prefered Source Code Management software, in our case it&amp;rsquo;s Git. Specify a sub-folder for checkout, because you&amp;rsquo;ll need a consistent way to refer to the repository from the Dockerfile.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://zubu.re/img/git_configuration.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Now you &amp;rsquo;ll need to create a Dockerfile to define your build environment. Since the afl-slave image takes care of everything AFL-related, you only need to specify the dependencies and steps to build your source code. In this case, the Dockerfile will look like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;FROM zubu/afl-slave
+
+# Copy lha code and build it
+WORKDIR /lha
+RUN aclocal
+RUN autoheader
+RUN automake -a
+RUN autoconf
+RUN ./configure &amp;amp;&amp;amp; make &amp;amp;&amp;amp; make clean all
+
+# Command to see check that everything&#39;s working
+CMD [&amp;quot;afl-fuzz&amp;quot;,&amp;quot;-i&amp;quot;,&amp;quot;/testcases&amp;quot;,&amp;quot;-o&amp;quot;,&amp;quot;/tmp/output&amp;quot;,&amp;quot;/lha/src/lha&amp;quot;,&amp;quot;x&amp;quot;,&amp;quot;@@&amp;quot;,&amp;quot;-w /tmp&amp;quot;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Place the Dockerfile in your workspace, in Debian-based distributions that&amp;rsquo;s &lt;code&gt;/var/lib/jenkins/workspace/&amp;lt;item name&amp;gt;&lt;/code&gt;. Select &amp;ldquo;&lt;strong&gt;Build inside a Docker container&lt;/strong&gt;&amp;rdquo;. Add two volumes, one for your test cases and one for AFL output. Place the Dockerfile inside your project&amp;rsquo;s workspace and specify the path in &amp;ldquo;path to docker context&amp;rdquo; field.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://zubu.re/img/docker_volumes.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&#34;running-your-fuzzing-job&#34;&gt;Running your fuzzing job&lt;/h1&gt;
+
+&lt;p&gt;For demo purposes let&amp;rsquo;s fuzz the &lt;code&gt;lha&lt;/code&gt; executable. Select &amp;ldquo;&lt;strong&gt;Add Build Step&lt;/strong&gt;&amp;rdquo; and choose &amp;ldquo;&lt;strong&gt;Execute Shell&lt;/strong&gt;&amp;rdquo;. Add the following:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;afl-fuzz -i /testcases -o /output/$BUILD_NUMBER /lha/src/lha x @@ -w /tmp
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Don&amp;rsquo;t forget to run &lt;code&gt;echo core &amp;gt;/proc/sys/kernel/core_pattern&lt;/code&gt; in your Docker host before starting the container. For more information regarding the AFL fuzzer you can visit the official &lt;a href=&#34;http://lcamtuf.coredump.cx/afl/README.txt&#34;&gt;README&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Save your job and click &amp;ldquo;&lt;strong&gt;Build Now&lt;/strong&gt;&amp;rdquo;.&lt;/p&gt;
+
+&lt;h2 id=&#34;future-work&#34;&gt;Future Work&lt;/h2&gt;
+
+&lt;p&gt;The process of evaluating your fuzz test results can be quite painful. Since I&amp;rsquo;m looking into ways of automating the whole process, I plan to add Ben Nagy&amp;rsquo;s &lt;a href=&#34;https://github.com/bnagy/crashwalk&#34;&gt;crashwalk&lt;/a&gt; in the afl-slave image. Crashwalk automatically performs bug triage and produces readable (and/or parsable) reports for each crashing test case. I was planning on including it in this tutorial but unfortunately GDB does not always play well with containers. &lt;strong&gt;Stay tuned for Part 2!&lt;/strong&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Bottle Security Checklist</title>
+      <link>https://zubu.re/blog/bottle-security-checklist/</link>
+      <pubDate>Fri, 18 Dec 2015 16:47:16 +0000</pubDate>
+      
+      <guid>https://zubu.re/blog/bottle-security-checklist/</guid>
+      <description>
+
+&lt;p&gt;&lt;a href=&#34;http://bottlepy.org/docs/stable/index.html&#34;&gt;Bottle&lt;/a&gt; is a micro web-framework for Python, strongly resembling Flask. I was attracted by its even greater simplicity (no dependencies!) and I gave it a try in a few projects (e.x spamcan). Although Bottle&amp;rsquo;s documentation is very helpful, I noticed that it lacks detail in secure best practices.&lt;/p&gt;
+
+&lt;p&gt;Since micro-frameworks equal to small learning curves and small learning curves usually result to fast-paced development, I compiled a security checklist, covering the basics, that can be used as a reference when developing Bottle-based applications.
+Update, update, update!&lt;/p&gt;
+
+&lt;p&gt;No matter how small your framework&amp;rsquo;s codebase is, bugs will occur. Once in a while, they will be &lt;a href=&#34;http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-3137&#34;&gt;serious&lt;/a&gt; too. Always keep an eye for security patches and update to the latest stable release when possible.&lt;/p&gt;
+
+&lt;h1 id=&#34;sql-injection&#34;&gt;SQL Injection&lt;/h1&gt;
+
+&lt;p&gt;If your custom SQL queries accept user input you &amp;rsquo;re going to have a hard time securing every single one of them. Unless you have a good reason not to, use &lt;a href=&#34;https://github.com/iurisilvio/bottle-sqlalchemy&#34;&gt;Bottle-SQLalchemy&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h1 id=&#34;cross-site-scripting-xss&#34;&gt;Cross-Site Scripting (XSS)&lt;/h1&gt;
+
+&lt;p&gt;Bottle uses the built-in SimpleTemplate Engine by default but also supports Mako, Cheetah and Jinja2 template engines.&lt;/p&gt;
+
+&lt;p&gt;When using SimpleTemplate, variables referenced inside curly brackets have their values automatically HTML-escaped. Escaping can be disabled by starting the expression with an exclamation mark. The following example is provided in the documentation:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;    &amp;gt;&amp;gt;&amp;gt;template(&#39;Hello {{name}}!&#39;, name=&#39;&amp;lt;b&amp;gt;World&amp;lt;/b&amp;gt;&#39;)
+    u&#39;Hello &amp;amp;lt;b&amp;amp;gt;World&amp;amp;lt;/b&amp;amp;gt;!&#39;
+    &amp;gt;&amp;gt;&amp;gt;template(&#39;Hello {{!name}}!&#39;, name=&#39;&amp;lt;b&amp;gt;World&amp;lt;/b&amp;gt;&#39;)
+    u&#39;Hello &amp;lt;b&amp;gt;World&amp;lt;/b&amp;gt;!&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Jinja2&lt;/strong&gt; has two &lt;a href=&#34;http://jinja.pocoo.org/docs/dev/templates/#html-escaping&#34;&gt;modes&lt;/a&gt; of HTML escaping, automatic and manual. You should prefer automatic where all values are escaped unless stated otherwise using the &lt;code&gt;safe&lt;/code&gt; filter e.x &lt;code&gt;{{title | safe}}&lt;/code&gt;. Automatic escaping can be enabled using an environmental &lt;a href=&#34;http://jinja.pocoo.org/docs/dev/api/#jinja2.Environment&#34;&gt;variable&lt;/a&gt; or a template &lt;a href=&#34;http://jinja.pocoo.org/docs/dev/templates/#autoescape-extension&#34;&gt;statement&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Mako&lt;/strong&gt; template engine uses the h built-in flag to escape HTML characters e.x &lt;code&gt;{{name | h }}&lt;/code&gt;. More on expression filtering in Mako &lt;a href=&#34;http://docs.makotemplates.org/en/latest/filtering.html?highlight=escape#expression-filtering&#34;&gt;here&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Cheetah&lt;/strong&gt; provides a &lt;a href=&#34;http://www.cheetahtemplate.org/docs/users_guide_html_multipage/output.filter.html&#34;&gt;WebSafe&lt;/a&gt; filter for HTML escaping.&lt;/p&gt;
+
+&lt;h1 id=&#34;csrf&#34;&gt;CSRF&lt;/h1&gt;
+
+&lt;p&gt;Bottle does not provide any built-in mechanism for CSRF protection. The easiest (and probably safest) solution is to use the Bottle Utils package which contains the &lt;a href=&#34;http://outernet-project.github.io/bottle-utils/&#34;&gt;bottle-utils-csrf&lt;/a&gt; (can be installed seperately). Usage is pretty &lt;a href=&#34;http://outernet-project.github.io/bottle-utils/csrf.html&#34;&gt;simple&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h1 id=&#34;file-uploads&#34;&gt;File Uploads&lt;/h1&gt;
+
+&lt;p&gt;Bottle documentation contains a rather insecure &lt;a href=&#34;http://bottlepy.org/docs/stable/tutorial.html#file-uploads&#34;&gt;example&lt;/a&gt; for filetype validation in upload forms. File type validation should not rely only on file extensions, it should also validate the files&amp;rsquo; content. This can be easily performed using &lt;a href=&#34;https://github.com/ahupp/python-magic&#34;&gt;python-magic&lt;/a&gt;. A better, more secure example would be:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import magic
+
+...
+
+@app.post(&#39;/&#39;)
+def upload():
+    allowed_mimetypes = [&#39;image/png&#39;]
+    upload = request.files.get(&#39;uploadfile&#39;)
+    filetype = magic.from_buffer(upload.file.read(), mime=True)
+    if filetype in allowed_mimetypes:
+        save_path = &amp;quot;uploads&amp;quot;
+        upload.save(save_path)
+        return &#39;OK&#39;
+    else:
+        return &amp;quot;Filetype not allowed&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;cookies&#34;&gt;Cookies&lt;/h1&gt;
+
+&lt;p&gt;Bottle has no built-in mechanism for session management. The official documentation suggests using &lt;a href=&#34;http://beaker.readthedocs.org/en/latest/&#34;&gt;beaker&lt;/a&gt; or writing your own implementation. Anyway, don&amp;rsquo;t forget to encrypt and mark all of your app&amp;rsquo;s sensitive cookies with HttpOnly and Secure (in case of HTTPS-enabled sites) &lt;a href=&#34;http://bottlepy.org/docs/stable/api.html?highlight=cookie#bottle.BaseResponse.set_cookie&#34;&gt;flags&lt;/a&gt;. &lt;strong&gt;Both flags are disabled by default&lt;/strong&gt;. Modified &lt;a href=&#34;http://bottlepy.org/docs/stable/tutorial.html#cookies&#34;&gt;example&lt;/a&gt; code from documentation (assuming that login uses HTTPS):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;@route(&#39;/login&#39;)
+def do_login():
+    username = request.forms.get(&#39;username&#39;)
+    password = request.forms.get(&#39;password&#39;)
+    if check_login(username, password):
+        response.set_cookie(&amp;quot;account&amp;quot;, username, secret=&#39;some-secret-key&#39;,\
+                             secure=True, httponly=True)
+        return template(&amp;quot;&amp;lt;p&amp;gt;Welcome {{name}}! You are now logged in.&amp;lt;/p&amp;gt;&amp;quot;, name=username)
+    else:
+        return &amp;quot;&amp;lt;p&amp;gt;Login failed.&amp;lt;/p&amp;gt;&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;redirects&#34;&gt;Redirects&lt;/h1&gt;
+
+&lt;p&gt;At the moment Bottle&amp;rsquo;s &lt;code&gt;redirect()&lt;/code&gt; method supports absolute URLs. In order to avoid any potential malicious redirects, do not pass user-defined values to this method. This behaviour will change in 0.13, which is still under development, to comply with &lt;a href=&#34;https://github.com/bottlepy/bottle/issues/749&#34;&gt;RFC7231&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h1 id=&#34;deployment&#34;&gt;Deployment&lt;/h1&gt;
+
+&lt;p&gt;When you use Bottle code in production :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Do not run Bottle as root&lt;/li&gt;
+&lt;li&gt;Disable &lt;a href=&#34;http://bottlepy.org/docs/stable/api.html?highlight=debug#bottle.debug&#34;&gt;debug&lt;/a&gt; output&lt;/li&gt;
+&lt;li&gt;Avoid the &lt;a href=&#34;http://bottlepy.org/docs/stable/tutorial_app.html#server-setup&#34;&gt;built-in&lt;/a&gt; web server.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I plan to keep this post updated so if you have any comments, suggestions or additions don&amp;rsquo;t hesitate to contact me.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Track who&#39;s leaking your e-mail address using Postfix</title>
+      <link>https://zubu.re/blog/track-whos-leaking-your-e-mail-address-using-postfix/</link>
+      <pubDate>Mon, 16 Nov 2015 16:03:15 +0000</pubDate>
+      
+      <guid>https://zubu.re/blog/track-whos-leaking-your-e-mail-address-using-postfix/</guid>
+      <description>&lt;p&gt;Curious about who is selling your e-mail address to spammers?&lt;/p&gt;
+
+&lt;p&gt;Most of us prefer to keep our material world contact information private. We usually share our phone number or home address with people we trust. However, in order to use most web services we are required to provide an e-mail address. Meanwhile the trustworthiness of a service is determined long after it gets hold of this info.&lt;/p&gt;
+
+&lt;p&gt;Surprisingly, e-mail addresses are a precious commodity. They are bought and sold everyday. They get leaked due to poor website design or dumped from hacked websites, along with the rest of your personal information. Is there a way to determine who leaked/sold your address? Considering the fact that we use the same e-mail address again and again, this can be nearly impossible unless you have a unique address for every single account you register (and spammers are aware of tricks like this). This is one of the many perks in hosting your own mail server.&lt;/p&gt;
+
+&lt;p&gt;Consider the following senario. You own &lt;code&gt;ihatespam.com&lt;/code&gt; and &lt;code&gt;mail.ihatespam.com&lt;/code&gt; MX record points to your Postfix mail server. Your precious personal e-mail address is &lt;code&gt;johndoe@ihatespam.com&lt;/code&gt; but you don&amp;rsquo;t want to give it away to every website you visit. Furthermore, you would like to know who is responsible for all the spam you receive.&lt;/p&gt;
+
+&lt;p&gt;You can achieve this by using unique non-existent e-mail addresses and redirect every e-mail you receive to those non-existent addresses to your inbox. Just add the following to `&lt;code&gt;/etc/postfix/main.cf&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;luser_relay = johndoe   #Use your username/mail account here
+local_recipient_maps =
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;and reload your Postfix configuration&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;service postfix reload&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;The above configuration creates a catch-all destination for unknown recipients, instead of returning messages as undeliverable, which is the default behavior.&lt;/p&gt;
+
+&lt;p&gt;Now you can use unique e-mail addresses (e.x &lt;em&gt;john_lnkdn@ihatespam.com&lt;/em&gt;, &lt;em&gt;john_fcbk@ihatespam.com&lt;/em&gt;, &lt;em&gt;john_twitr@ihatespam.com&lt;/em&gt;) to track any shady use of your personal information without having to manage multiple inboxes.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
