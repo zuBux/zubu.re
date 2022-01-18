@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Build website
 
 # Controls when the workflow will run
 on:
@@ -30,8 +30,14 @@ jobs:
         run: echo Hello, world!
       
       - name: Download hugo
-        run: wget https://github.com/gohugoio/hugo/releases/download/v0.92.0/hugo_0.92.0_Linux-ARM.tar.gz
+        run: | 
+	  wget https://github.com/gohugoio/hugo/releases/download/v0.92.0/hugo_0.92.0_Linux-ARM.tar.gz
+	  tar xvf hugo_0.92.0_Linux-ARM.tar.gz
+	  mv hugo /usr/local/bin
+	  chmod +x /usr/local/bin/hugo
 
+      - name: Build Site
+        run: hugo -s $GITHUB_WORKSPACE
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
         run: |
