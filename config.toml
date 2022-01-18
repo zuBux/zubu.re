@@ -1,4 +1,4 @@
-baseurl = "https://zubu.re/"
+baseurl = "https://zubux.github.io/"
 theme = "cocoa-eh"
 builddrafts = true
 canonifyurls = true
