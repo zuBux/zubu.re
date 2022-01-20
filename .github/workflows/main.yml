@@ -28,8 +28,8 @@ jobs:
       # Downloads hugo
       - name: Download hugo
         run: |
-         wget https://github.com/gohugoio/hugo/releases/download/v0.92.0/hugo_0.92.0_Linux-ARM64.tar.gz
-         tar xvf hugo_0.92.0_Linux-ARM64.tar.gz
+         wget https://github.com/gohugoio/hugo/releases/download/v0.92.0/hugo_0.92.0_Linux-64bit.tar.gz
+         tar xvf hugo_0.92.0_Linux-64bit.tar.gz
          mv hugo /usr/local/bin
          chmod +x /usr/local/bin/hugo
 
