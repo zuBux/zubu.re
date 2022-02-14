@@ -43,3 +43,14 @@ jobs:
           echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
           sudo apt update
           sudo apt install gh
+
+      - name: Connect to github
+        run: |
+          echo $GH_ACCESS_TOKEN > gh_pat
+          gh auth login --with-token < gh_pat
+          rm gh_pat
+      - name: Create PR
+        run: |
+          gh repo clone https://github.com/zuBux/zuBux.github.io.git
+          cd zuBux.github.io/
+          ls
