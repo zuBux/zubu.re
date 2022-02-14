@@ -24,17 +24,14 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
       
+      # Downloads hugo
       - name: Download hugo
-        run: | 
-	  wget https://github.com/gohugoio/hugo/releases/download/v0.92.0/hugo_0.92.0_Linux-ARM.tar.gz
-	  tar xvf hugo_0.92.0_Linux-ARM.tar.gz
-	  mv hugo /usr/local/bin
-	  chmod +x /usr/local/bin/hugo
+        run: |
+         wget https://github.com/gohugoio/hugo/releases/download/v0.92.0/hugo_0.92.0_Linux-64bit.tar.gz
+         tar xvf hugo_0.92.0_Linux-64bit.tar.gz
+         mv hugo /usr/local/bin
+         chmod +x /usr/local/bin/hugo
 
       - name: Build Site
         run: hugo -s $GITHUB_WORKSPACE
