@@ -54,9 +54,10 @@ jobs:
         run: |
           gh repo clone https://github.com/zuBux/zuBux.github.io.git
           cd zuBux.github.io/
-          cp -a $GITHUB_WORKSPACE/public/. .
           git config --global user.email "zubu@zubu.re"
           git config --global user.name "zuBu"
           git checkout -b new-post
+          cp -a $GITHUB_WORKSPACE/public/. .
+          git add .
           git commit -a -m "New post"
           gh pr create --title "New post" --body "This is a test"

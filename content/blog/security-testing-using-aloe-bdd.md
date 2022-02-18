@@ -146,6 +146,7 @@ def teardown_browser(scenario, outline, steps):
     world.session_tokens = []
     world.browser.delete_all_cookies()
     world.browser.quit()
+
 ```
 
 Step code is pretty much self-explanatory. A few noteworthy points:
