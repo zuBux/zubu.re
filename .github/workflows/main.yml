@@ -32,10 +32,10 @@ jobs:
          tar xvf hugo_0.92.0_Linux-64bit.tar.gz
          mv hugo /usr/local/bin
          chmod +x /usr/local/bin/hugo
-         ls -la $GITHUB_WORKSPACE
+         ls -la .
 
       - name: Build Site
-        run: hugo -s $GITHUB_WORKSPACE
+        run: hugo -s .
 
       # Runs a set of commands using the runners shell
       - name: Install gh cli
