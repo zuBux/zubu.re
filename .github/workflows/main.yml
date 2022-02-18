@@ -32,6 +32,7 @@ jobs:
          tar xvf hugo_0.92.0_Linux-64bit.tar.gz
          mv hugo /usr/local/bin
          chmod +x /usr/local/bin/hugo
+         ls -la $GITHUB_WORKSPACE
 
       - name: Build Site
         run: hugo -s $GITHUB_WORKSPACE
@@ -57,6 +58,7 @@ jobs:
           git config --global user.email "zubu@zubu.re"
           git config --global user.name "zuBu"
           git checkout -b new-post
+          ls -la $GITHUB_WORKSPACE/public/.
           cp -a $GITHUB_WORKSPACE/public/. .
           git add .
           git commit -a -m "New post"
