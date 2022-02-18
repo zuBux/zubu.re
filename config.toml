@@ -1,5 +1,5 @@
 baseurl = "https://zubux.github.io/"
-theme = "cocoa-eh"
+theme = "cocoa-eh-hugo-theme"
 builddrafts = true
 canonifyurls = true
 contentdir = "content"
