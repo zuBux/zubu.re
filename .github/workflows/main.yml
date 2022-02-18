@@ -57,6 +57,7 @@ jobs:
           git config --global user.email "zubu@zubu.re"
           git config --global user.name "zuBu"
           git checkout -b new-post
+          ls -la $GITHUB_WORKSPACE/public/.
           cp -a $GITHUB_WORKSPACE/public/. .
           git add .
           git commit -a -m "New post"
