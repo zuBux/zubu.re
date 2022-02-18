@@ -2,6 +2,7 @@
 date = "2016-02-15T17:03:05Z"
 title = "Actionable security requirements using BDD"
 
+
 +++
 
 # Short intro to BDD
