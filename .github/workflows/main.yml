@@ -35,11 +35,11 @@ jobs:
          mv hugo /usr/local/bin
          chmod +x /usr/local/bin/hugo
          mkdir public
-         export WWW_DIR=`pwd`
-         echo $WWW_DIR
 
       - name: Build Site
-        run: hugo -s .
+        run: | 
+         hugo -s .
+         mv public /tmp/
 
       - name: Check out my other private repo
         uses: actions/checkout@master
@@ -52,9 +52,8 @@ jobs:
           git config --global user.email 'zuBux@users.noreply.github.com'
           git config --global user.name "zuBux"
           git checkout -b new-post
-          echo $WWW_DIR
-          ls -la /home/runner/work/zubu.re/zubu.re/public/.
-          cp -a /home/runner/work/zubu.re/zubu.re/public/. .
+          ls -la /tmp/public/.
+          cp -a /tmp/public/. .
           git add .
           git commit -a -m "New post"
 
