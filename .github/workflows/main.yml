@@ -56,13 +56,15 @@ jobs:
 
       - name: Create PR
         run: |
-          git config --global user.email $GH_EMAIL
+          git config --global user.email 'zuBux@users.noreply.github.com'
           git config --global user.name "zuBux"
           gh repo clone https://github.com/zuBux/zuBux.github.io.git
           cd zuBux.github.io/
+          git remote set-url origin https://x-access-token:$GH_ACCESS_TOKEN@github.com/zuBux/zuBux.github.io
           git checkout -b new-post
           ls -la $GITHUB_WORKSPACE/public/.
           cp -a $GITHUB_WORKSPACE/public/. .
           git add .
           git commit -a -m "New post"
+          git push origin new-post
           gh pr create --head --title "New post" --body "This is a test"
