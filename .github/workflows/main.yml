@@ -35,19 +35,11 @@ jobs:
          mv hugo /usr/local/bin
          chmod +x /usr/local/bin/hugo
          mkdir public
-         ls -la themes/cocoa-eh-hugo-theme
 
       - name: Build Site
         run: hugo -s .
 
       # Runs a set of commands using the runners shell
-      - name: Install gh cli
-        run: |
-          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-          sudo apt update
-          sudo apt install gh
-
       - name: Connect to github
         run: |
           echo $GH_ACCESS_TOKEN > gh_pat
@@ -56,7 +48,7 @@ jobs:
 
       - name: Create PR
         run: |
-          gh repo clone https://github.com/zuBux/zuBux.github.io
+          gh repo clone https://github.com/zuBux/zuBux.github.io.git
           cd zuBux.github.io/
           git config --global user.email $GH_EMAIL
           git config --global user.name "zuBux"
