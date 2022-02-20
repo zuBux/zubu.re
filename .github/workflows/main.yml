@@ -66,4 +66,4 @@ jobs:
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GH_CLI_PAT }}
-          branch: "main
+          branch: "main"
