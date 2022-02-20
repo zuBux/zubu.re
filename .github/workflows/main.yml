@@ -34,6 +34,7 @@ jobs:
          tar xvf hugo_0.92.0_Linux-64bit.tar.gz
          mv hugo /usr/local/bin
          chmod +x /usr/local/bin/hugo
+         mkdir public
          ls -la themes/cocoa-eh-hugo-theme
 
       - name: Build Site
