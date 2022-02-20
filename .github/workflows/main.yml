@@ -54,14 +54,16 @@ jobs:
 
       - name: Create PR
         run: |
-          ls -la
-          git config --global user.email $GH_EMAIL
+          git config --global user.email 'zuBux@users.noreply.github.com'
           git config --global user.name "zuBux"
-          git remote set-url origin https://$GH_USER:$GH_ACCESS_TOKEN@github.com/zuBux/zuBux.github.io.git
           git checkout -b new-post
           ls -la $GITHUB_WORKSPACE/public/.
           cp -a $GITHUB_WORKSPACE/public/. .
           git add .
           git commit -a -m "New post"
-          git push origin new-post
-          gh pr create --head --title "New post" --body "This is a test"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GH_CLI_PAT }}
+          branch: "main
