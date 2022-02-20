@@ -35,7 +35,7 @@ jobs:
          mv hugo /usr/local/bin
          chmod +x /usr/local/bin/hugo
          mkdir public
-	 export WWW_DIR=`pwd`
+         export WWW_DIR=`pwd`
 
       - name: Build Site
         run: hugo -s .
