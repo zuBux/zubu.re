@@ -7,7 +7,7 @@ title = "Actionable security requirements using BDD"
 
 # Short intro to BDD
 
-Checklists are useful for many security-related tasks. Whether we 're threat modeling, code reviewing or pentesting an application, at some point we all feel an urge to tick off some check boxes. Checklists are also a very compact way to communicate security requirements. However sometimes we take for granted that these requirements are understandable by all involved parties. This assumption may result to dialogues like the following:
+Checklists are useful for many security-related tasks. Whether we are threat modeling, code reviewing or pentesting an application, at some point we all feel an urge to tick off some check boxes. Checklists are also a very compact way to communicate security requirements. However sometimes we take for granted that these requirements are understandable by all involved parties. This assumption may result to dialogues like the following:
 
 > -Hey, you mention here that our app is vulnerable to session fixation.
 
