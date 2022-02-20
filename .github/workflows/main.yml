@@ -53,8 +53,8 @@ jobs:
           git config --global user.name "zuBux"
           git checkout -b new-post
           echo $WWW_DIR
-          ls -la $WWW_DIR/public/.
-          cp -a $WWW_DIR/public/. .
+          ls -la /home/runner/work/zubu.re/zubu.re/public/.
+          cp -a /home/runner/work/zubu.re/zubu.re/public/. .
           git add .
           git commit -a -m "New post"
 
