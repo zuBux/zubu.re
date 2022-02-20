@@ -46,9 +46,15 @@ jobs:
           gh auth login --with-token < gh_pat
           rm gh_pat
 
+      - name: Check out my other private repo
+        uses: actions/checkout@master
+        with:
+          repository: zuBux/zuBux.github.io
+          token: ${{ secrets.GH_CLI_PAT }}
+
       - name: Create PR
         run: |
-          git clone https://github.com/zuBux/zuBux.github.io.git
+          ls -la
           cd zuBux.github.io/
           git config --global user.email $GH_EMAIL
           git config --global user.name "zuBux"
