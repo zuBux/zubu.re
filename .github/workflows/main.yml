@@ -58,8 +58,8 @@ jobs:
         run: |
           gh repo clone https://github.com/zuBux/zuBux.github.io.git
           cd zuBux.github.io/
-          git config --global user.email "zubu@zubu.re"
-          git config --global user.name "zuBu"
+          git config --global user.email $GH_EMAIL
+          git config --global user.name "zuBux"
           git checkout -b new-post
           ls -la $GITHUB_WORKSPACE/public/.
           cp -a $GITHUB_WORKSPACE/public/. .
