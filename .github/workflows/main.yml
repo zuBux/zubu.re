@@ -59,6 +59,6 @@ jobs:
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
-          repository: "https://github.com/zuBux/zuBux.github.io.git"
+          repository: "zuBux/zuBux.github.io"
           github_token: ${{ secrets.GH_CLI_PAT }}
           branch: "main"
