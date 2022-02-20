@@ -36,6 +36,7 @@ jobs:
          chmod +x /usr/local/bin/hugo
          mkdir public
          export WWW_DIR=`pwd`
+         echo $WWW_DIR
 
       - name: Build Site
         run: hugo -s .
@@ -58,6 +59,7 @@ jobs:
           git config --global user.email 'zuBux@users.noreply.github.com'
           git config --global user.name "zuBux"
           git checkout -b new-post
+          echo $WWW_DIR
           ls -la $WWW_DIR/public/.
           cp -a $WWW_DIR/public/. .
           git add .
