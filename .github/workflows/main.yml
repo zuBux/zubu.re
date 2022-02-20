@@ -48,7 +48,7 @@ jobs:
 
       - name: Create PR
         run: |
-          gh repo clone https://github.com/zuBux/zuBux.github.io.git
+          git clone https://github.com/zuBux/zuBux.github.io.git
           cd zuBux.github.io/
           git config --global user.email $GH_EMAIL
           git config --global user.name "zuBux"
